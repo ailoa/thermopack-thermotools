@@ -161,7 +161,6 @@ contains
   !!
   function isComponent(cid, cname) result(isComp)
     use stringmod, only: str_eq
-    implicit none
     character(len=*), intent(in) :: cid
     character(len=*), intent(in) :: cname
     logical :: isComp
@@ -174,7 +173,6 @@ contains
   !> Is referance tag in referance list?
   !!
   function isRef(ref, ref_list) result(isR)
-    implicit none
     character(len=*), intent(in) :: ref
     character(len=*), intent(in) :: ref_list
     logical :: isR
@@ -188,7 +186,6 @@ contains
   !!
   function isEOS(eosid, eos) result(isE)
     use stringmod, only: str_eq
-    implicit none
     character(len=*), intent(in) :: eosid
     character(len=*), intent(in) :: eos
     logical :: isE
@@ -201,7 +198,6 @@ contains
   !> Assignment operator for gendatadb
   !!
   subroutine assign_gendatadb(this,cmp)
-    implicit none
     class(gendatadb), intent(inout) :: this
     class(*), intent(in) :: cmp
 
@@ -240,7 +236,6 @@ contains
   !> Assignment operator for gendata
   !!
   subroutine assign_gendata(this,cmp)
-    implicit none
     class(gendata), intent(inout) :: this
     class(*), intent(in) :: cmp
 
@@ -309,7 +304,7 @@ contains
     do i=1,ncomp
       do j=1,ncomp
         if (trim(complist(i)) == trim(complist(j)) .and. j /= i) then
-          Call StopError('Duplicate in component list. Check input!')
+          print *, 'WARNING: Duplicate in component list. Check input!'
         endif
       enddo
     enddo
@@ -365,21 +360,13 @@ contains
     enddo
   end function getComp
 
-  !> Select all components in the mixture
-  !! The parameters are:
-  !!
-  !!  \param comp_string The compontn string sperated either by "," or by " ".
-  !!
-  !! Example tpSelectComp ('C1 CO2 N2') or tpSelectComp ('C1,CO2,N2')
-  !!
-  !! \author Geir S
-  subroutine SelectComp(complist,nc,ref,comp,ierr)
-    implicit none
-    character(len=*), intent(in) :: complist(:)
-    integer, intent(in) :: nc
-    character(len=*), intent(in) :: ref
-    type(gendata_pointer), allocatable, dimension(:), intent(inout) :: comp
-    integer, intent(out) :: ierr
+  !> Initialize component data from compdatadb
+  subroutine init_component_data_from_db(complist,nc,ref,comp,ierr)
+    character(len=*), intent(in) :: complist(:) !< List of component names
+    integer, intent(in) :: nc !< Number of components
+    character(len=*), intent(in) :: ref !< Reference for ideal cp correlation
+    type(gendata_pointer), allocatable, dimension(:), intent(inout) :: comp !< Pointer to structure for holding data
+    integer, intent(out) :: ierr ! <Error flag (0 means success)
     ! Loclas
     integer :: i, stat
     call deallocate_comp(comp)
@@ -390,10 +377,9 @@ contains
       if (stat /= 0) write (*,*) 'Error allocating p_comp'
       call comp(i)%p_comp%init_from_name(complist(i),ref,ierr)
     enddo
-  end subroutine SelectComp
+  end subroutine init_component_data_from_db
 
   subroutine deallocate_comp(comp)
-    implicit none
     type(gendata_pointer), allocatable, dimension(:), intent(inout) :: comp
     ! Loclas
     integer :: stat, i
@@ -409,7 +395,6 @@ contains
   end subroutine deallocate_comp
 
   subroutine copy_comp(comp_cpy, comp)
-    implicit none
     type(gendata_pointer), allocatable, dimension(:), intent(inout) :: comp_cpy
     type(gendata_pointer), allocatable, dimension(:), intent(in) :: comp
     ! Loclas
@@ -438,7 +423,6 @@ contains
   end subroutine copy_comp
 
   subroutine cidatadb_get_vol_trs_c(cid, T, ci, cit, citt, ci_temp_dep)
-    implicit none
     class(cidatadb), intent(in) :: cid
     real, intent(in) :: T !< Temperature (K)
     real, intent(out) :: ci !< Volume translation (m3/mol)
@@ -471,7 +455,6 @@ contains
   end subroutine cidatadb_get_vol_trs_c
 
   subroutine cidatadb_set_zero_vol_trs(cid)
-    implicit none
     class(cidatadb), intent(inout) :: cid
     cid%ciA = 0
     cid%ciB = 0
