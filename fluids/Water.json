@@ -10,9 +10,9 @@
   "critical": {
     "ref": "Default",
     "bib_reference": "",
-    "temperature": 647.3,
-    "pressure": 22048300.0,
-    "compressibility": 0.229
+    "temperature": 647.096,
+    "pressure": 22064000.0,
+    "compressibility": 0.22944
   },
   "triple": {
     "ref": "Default",
@@ -23,7 +23,7 @@
   "acentric_factor": {
     "ref": "Default",
     "bib_reference": "",
-    "acf": 0.344
+    "acf": 0.3442920843
   },
   "boiling_temperature": {
     "bib_reference": "",

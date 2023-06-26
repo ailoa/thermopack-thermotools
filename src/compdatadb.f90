@@ -1,6 +1,6 @@
 !> Automatically generated to file compdatadb.f90
 !! using utility python code pyUtils
-!! Time stamp: 2023-05-10T13:56:59.688774
+!! Time stamp: 2023-06-26T18:04:17.091965
 
 module compdatadb
   use compdata, only: gendatadb, cpdata, alphadatadb, cidatadb, CPAdata
@@ -754,10 +754,10 @@ module compdatadb
       formula = "NH3", &
       name = "AMMONIA", &
       mw = 17.0310, &
-      Tc = 405.4, &
-      Pc = 11333000.0, &
+      Tc = 405.4000, &
+      Pc = 11333000.00, &
       Zc = 0.254487, &
-      acf = 0.256, &
+      acf = 0.256000, &
       Tb = 239.7000, &
       Ttr = 0.0000, &
       Ptr = 0.0000, &
@@ -1092,9 +1092,9 @@ module compdatadb
       name = "CARBON DIOXIDE", &
       mw = 44.0100, &
       Tc = 304.1282, &
-      Pc = 7377300.0, &
-      Zc = 0.2746, &
-      acf = 0.22394, &
+      Pc = 7377300.00, &
+      Zc = 0.274600, &
+      acf = 0.223940, &
       Tb = 194.7000, &
       Ttr = 0.0000, &
       Ptr = 0.0000, &
@@ -2819,10 +2819,10 @@ module compdatadb
       cpdata(cid = "LJF", &
       ref = "Default", &
       bib_ref = "", &
-      cptype = 7, &
-      cp = (/0.00000000e+00,0.00000000e+00,0.00000000e+00,0.00000000e+00,0.00000000e+00, &
+      cptype = 8, &
+      cp = (/2.50000000e+00,0.00000000e+00,0.00000000e+00,0.00000000e+00,0.00000000e+00, &
       0.00000000e+00,0.00000000e+00,0.00000000e+00,0.00000000e+00,0.00000000e+00/), &
-      Tcpmin = 300.0000, &
+      Tcpmin = 0.0000, &
       Tcpmax = 1500.0000  &
       )
 
@@ -6121,10 +6121,10 @@ module compdatadb
       formula = "H2O", &
       name = "WATER", &
       mw = 18.0150, &
-      Tc = 647.096, &
-      Pc = 22064000.0, &
-      Zc = 0.22944, &
-      acf = 0.3442920843, &
+      Tc = 647.0960, &
+      Pc = 22064000.00, &
+      Zc = 0.229440, &
+      acf = 0.344292, &
       Tb = 373.2000, &
       Ttr = 0.0000, &
       Ptr = 0.0000, &

@@ -26,8 +26,8 @@ contains
 
     call calcCritical(t,p,Z,VAPPH,ierr)
     @assertTrue(ierr == 0)
-    @assertEqual(287.66087195742074, T, 1e-06)
-    @assertEqual(104.09812884531468e5, p, 1e-01)
+    @assertEqual(287.57458524483229, T, 1e-06)
+    @assertEqual(10407983.561280208, p, 1e-01)
 
     T = -1.0
     v = -1.0
@@ -35,9 +35,9 @@ contains
     call calcCriticalTV(t,v,Z,ierr,tol)
     @assertTrue(ierr == 0)
     p = pressure(T,v,Z)
-    @assertEqual(8.62006E-005, v, 1e-10)
-    @assertEqual(287.66087, T, 5e-06)
-    @assertEqual(104.09813e5, p, 1.0)
+    @assertEqual(0.86176300888142712E-4, v, 1e-10)
+    @assertEqual(287.57458332896459, T, 5e-06)
+    @assertEqual(104.07983913703155e5, p, 1.0)
 
   end subroutine test_critical_point_co2n2
 
@@ -62,8 +62,8 @@ contains
 
     call calcCritical(t,p,Z,VAPPH,ierr)
     @assertTrue(ierr == 0)
-    @assertEqual(298.06403290820242, T, 1e-06)
-    @assertEqual(8608562.1947590690 , p, 1e-01)
+    @assertEqual(297.98685486941611, T, 1e-06)
+    @assertEqual(8608638.9174540266 , p, 1e-01)
 
     T = -1.0
     v = -1.0
@@ -71,9 +71,9 @@ contains
     call calcCriticalTV(t,v,Z,ierr,tol)
     @assertTrue(ierr == 0)
     p = pressure(T,v,Z)
-    @assertEqual(9.7353925540043384E-005, v, 5e-10)
-    @assertEqual(298.06404227591383, T, 5e-05)
-    @assertEqual(8608562.1708822846, p, 1.0)
+    @assertEqual(0.97322465628207284E-4, v, 5e-10)
+    @assertEqual(297.98685486941611, T, 5e-05)
+    @assertEqual(8608639.5027953647, p, 1.0)
 
   end subroutine test_critical_point_mix
 
