@@ -136,10 +136,10 @@ class cubic(thermo):
             comps (str): Comma separated list of component names
 
         """
-        comps_len = c_len_type(len(comps))
+        self.activate()
         comps_c = c_char_p(comps.encode('ascii'))
-        list_len = c_len_type(self.nc)
-        Tc_c = (c_double * len(Tclist))(*Tclist)
+        comps_len = c_len_type(len(comps))
+        Tc_c = (c_double * self.nc)(*Tclist)
         Pc_c = (c_double * self.nc)(*Pclist)
         acf_c = (c_double * self.nc)(*acflist)
 
@@ -156,7 +156,6 @@ class cubic(thermo):
                                                 POINTER(c_double),
                                                 POINTER(c_double),
                                                 c_len_type]
-
         self.eoslibinit_init_pseudo.restype = None
         self.eoslibinit_init_pseudo(comps_c,
                                     Tc_c,
