@@ -20,6 +20,7 @@ module eoslibinit
   private
   public :: init_thermo
   public :: init_cubic, init_cpa, init_saftvrmie, init_pcsaft, init_tcPR, init_quantum_cubic
+  public :: init_cubic_pseudo
   public :: init_extcsp, init_lee_kesler, init_quantum_saftvrmie
   public :: init_multiparameter, init_pets, init_ljs, init_lj
   public :: silent_init
@@ -357,7 +358,7 @@ contains
     select type(p_eos => act_mod_ptr%eos(1)%p_eos)
     type is (cb_eos)
       call SelectCubicEOS(nc, act_mod_ptr%comps, &
-           p_eos, alpha_loc, paramref_loc, betastr=beta_loc)
+           p_eos, alpha_loc, paramref_loc)
 
       call SelectMixingRules(nc, act_mod_ptr%comps, &
            p_eos, mixing_loc, paramref_loc)
@@ -372,6 +373,86 @@ contains
 
   end subroutine init_cubic
 
+
+  !----------------------------------------------------------------------------
+  !> Initialize pseudo components of a cubic EoS. Use:
+  !> call init_cubic("CO2,PSEUDO,PSEUDO")
+  !> call init_cubic_pseudo(names=(/"", "C20", "C25"/), Tclist=(\0,300,400\), &
+  !>                               Pclist=(\0,100e5,200e5\), acflist=(\0,0.3,0.5\))
+  !----------------------------------------------------------------------------
+  subroutine init_cubic_pseudo(comps, Tclist, Pclist, acflist, Mwlist, Tboillist, rholiqlist)
+    use compdata,   only: init_component_data_from_db, initCompList
+    use ideal, only: set_reference_energies
+    use thermopack_var, only: nc
+    use thermopack_constants, only: THERMOPACK
+    use cbselect, only: selectCubicEOS, SelectMixingRules
+    use cubic_eos, only: cb_eos
+    use volume_shift, only: InitVolumeShift
+    character(len=*), intent(in) :: comps         !< Components. Comma or white-space separated
+    real, intent(in)             :: Tclist(:)     !< List of critical temperatures (K)
+    real, intent(in)             :: Pclist(:)     !< List of critical pressures (Pa)
+    real, intent(in)             :: acflist(:)    !< List of acentric factors (-)
+    real, intent(in), optional   :: Mwlist(:)     !< List of molar masses (kg/mol)
+    real, intent(in), optional   :: Tboillist(:)  !< List of boiling point temperatures (K)
+    real, intent(in), optional   :: rholiqlist(:) !< List of liquid densities (kg/m3)
+    ! Locals
+    integer                          :: ncomp, i, index, matchval_pseudo
+    character(len=len_trim(comps))   :: comps_upper
+    type(thermo_model), pointer      :: act_mod_ptr
+    logical                          :: is_pseudo_comp(nc)
+    character(len=100)               :: mixing_loc, alpha_loc, paramref_loc, beta_loc
+    logical                          :: volshift_loc
+
+    ! Get a pointer to the active thermodynamics model
+    if (.not. active_thermo_model_is_associated()) then
+      ! No thermo_model has been allocated
+      index = add_eos()
+    endif
+    act_mod_ptr => get_active_thermo_model()
+
+    ! Special handling of pseudo components
+    is_pseudo_comp = .false.
+
+    ! Iterate through all components. If pseudo, update with corresponding value. 
+    do i=1,nc
+      call string_match_val("PSEUDO", act_mod_ptr%complist(i), is_pseudo_comp(i), matchval_pseudo)
+      if (is_pseudo_comp(i)) then
+        act_mod_ptr%comps(i)%p_comp%Tc = Tclist(i)
+        act_mod_ptr%comps(i)%p_comp%Pc = Pclist(i)
+        act_mod_ptr%comps(i)%p_comp%acf = acflist(i)
+        if (present(Mwlist)) act_mod_ptr%comps(i)%p_comp%Mw = Mwlist(i)
+        if (present(Tboillist)) act_mod_ptr%comps(i)%p_comp%Tb = Tboillist(i)
+      end if
+    enddo
+    
+    ! Set component list
+    comps_upper=trim(uppercase(comps))
+    call initCompList(comps_upper,ncomp,act_mod_ptr%complist)
+
+    mixing_loc = "vdW"
+    alpha_loc = "Classic"
+    paramref_loc = "DEFAULT"
+    volshift_loc = .False.
+    beta_loc = "Classic"
+    ! Initialize Thermopack
+    select type(p_eos => act_mod_ptr%eos(1)%p_eos)
+    type is (cb_eos)
+      call SelectCubicEOS(nc, act_mod_ptr%comps, &
+           p_eos, alpha_loc, paramref_loc, betastr=beta_loc)
+
+      call SelectMixingRules(nc, act_mod_ptr%comps, &
+           p_eos, mixing_loc, paramref_loc)
+    class default
+      call stoperror("init_cubic: Should be cubic EOS")
+   end select
+
+    ! Distribute parameters from redefined eos
+    do i=2,size(act_mod_ptr%eos)
+      act_mod_ptr%eos(i)%p_eos = act_mod_ptr%eos(1)%p_eos
+    enddo
+
+  end subroutine init_cubic_pseudo
+  
   !----------------------------------------------------------------------------
   !> Initialize translated and consistent cubic EoS by le Guennec et al.
   ! (10.1016/j.fluid.2016.09.003)
