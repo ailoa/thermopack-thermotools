@@ -143,6 +143,7 @@ append_export("idealentropysingle", "eos")
 
 append_export("init_thermo", "eoslibinit")
 append_export("init_cubic", "eoslibinit")
+append_export("init_cubic_pseudo", "eoslibinit")
 append_export("init_cpa", "eoslibinit")
 append_export("init_pcsaft", "eoslibinit")
 append_export("init_saftvrmie", "eoslibinit")

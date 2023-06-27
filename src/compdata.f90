@@ -300,14 +300,6 @@ contains
       complist(i)=comp_string(1:ipos)
       comp_string = comp_string(ipos+2:clen)
     enddo
-    ! Check for duplicates
-    do i=1,ncomp
-      do j=1,ncomp
-        if (trim(complist(i)) == trim(complist(j)) .and. j /= i) then
-          print *, 'WARNING: Duplicate in component list. Check input!'
-        endif
-      enddo
-    enddo
 
     if (verbose) then
       print *,'Component vector:'

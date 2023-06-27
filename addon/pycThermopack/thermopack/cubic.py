@@ -35,6 +35,7 @@ class cubic(thermo):
 
         # Init methods
         self.eoslibinit_init_cubic = getattr(self.tp, self.get_export_name("eoslibinit", "init_cubic"))
+        self.eoslibinit_init_pseudo = getattr(self.tp, self.get_export_name("eoslibinit", "init_cubic_pseudo"))
 
         # Tuning methods
         self.s_get_kij = getattr(self.tp, self.get_export_name("", "thermopack_getkij"))
@@ -126,6 +127,47 @@ class cubic(thermo):
                                    ref_string_len)
         self.nc = max(len(comps.split(" ")),len(comps.split(",")))
 
+    def init_pseudo(self, comps, Tclist, Pclist, acflist, Mwlist=None,
+                    Tboillist=None, rholiqlist=None):
+        """Initialize pseudocomponents of cubic model in thermopack. The cubic
+        init routine must have been called first.
+
+        Args:
+            comps (str): Comma separated list of component names
+
+        """
+        comps_len = c_len_type(len(comps))
+        comps_c = c_char_p(comps.encode('ascii'))
+        list_len = c_len_type(self.nc)
+        Tc_c = (c_double * len(Tclist))(*Tclist)
+        Pc_c = (c_double * self.nc)(*Pclist)
+        acf_c = (c_double * self.nc)(*acflist)
+
+        null_pointer = POINTER(c_double)()
+        Mw_c = null_pointer if Mwlist is None else (c_double * self.nc)(*Mwlist)
+        Tb_c = null_pointer if Tboillist is None else (c_double * self.nc)(*Tboillist)
+        rliq_c = null_pointer if rholiqlist is None else (c_double * self.nc)(*rholiqlist)
+            
+        self.eoslibinit_init_pseudo.argtypes = [c_char_p,
+                                                POINTER(c_double),
+                                                POINTER(c_double),
+                                                POINTER(c_double),
+                                                POINTER(c_double),
+                                                POINTER(c_double),
+                                                POINTER(c_double),
+                                                c_len_type]
+
+        self.eoslibinit_init_pseudo.restype = None
+        self.eoslibinit_init_pseudo(comps_c,
+                                    Tc_c,
+                                    Pc_c,
+                                    acf_c,
+                                    Mw_c,
+                                    Tb_c,
+                                    rliq_c,
+                                    comps_len)
+
+        
     def get_kij(self, c1, c2):
         """Get attractive energy interaction parameter kij, where aij = sqrt(ai*aj)*(1-kij)
 
