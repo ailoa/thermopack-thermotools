@@ -380,7 +380,7 @@ contains
   !> call init_cubic_pseudo(names=(/"", "C20", "C25"/), Tclist=(\0,300,400\), &
   !>                               Pclist=(\0,100e5,200e5\), acflist=(\0,0.3,0.5\))
   !----------------------------------------------------------------------------
-  subroutine init_cubic_pseudo(comps, Tclist, Pclist, acflist, Mwlist, Tboillist, rholiqlist)
+  subroutine init_cubic_pseudo(comps, Tclist, Pclist, acflist, Mwlist)
     use compdata,   only: init_component_data_from_db, initCompList
     use ideal, only: set_reference_energies
     use thermopack_var, only: nc
@@ -388,19 +388,17 @@ contains
     use cbselect, only: selectCubicEOS, SelectMixingRules
     use cubic_eos, only: cb_eos
     use volume_shift, only: InitVolumeShift
-    character(len=*), intent(in) :: comps         !< Components. Comma or white-space separated
-    real, intent(in)             :: Tclist(:)     !< List of critical temperatures (K)
-    real, intent(in)             :: Pclist(:)     !< List of critical pressures (Pa)
-    real, intent(in)             :: acflist(:)    !< List of acentric factors (-)
-    real, intent(in), optional   :: Mwlist(:)     !< List of molar masses (kg/mol)
-    real, intent(in), optional   :: Tboillist(:)  !< List of boiling point temperatures (K)
-    real, intent(in), optional   :: rholiqlist(:) !< List of liquid densities (kg/m3)
+    character(len=*), intent(in) :: comps          !< Components. Comma or white-space separated
+    real, intent(in)             :: Tclist(nc)     !< List of critical temperatures (K)
+    real, intent(in)             :: Pclist(nc)     !< List of critical pressures (Pa)
+    real, intent(in)             :: acflist(nc)    !< List of acentric factors (-)
+    real, intent(in), optional   :: Mwlist(nc)     !< List of molar masses (kg/mol)
     ! Locals
     integer                          :: ncomp, i, index, matchval_pseudo
     character(len=len_trim(comps))   :: comps_upper
     type(thermo_model), pointer      :: act_mod_ptr
     logical                          :: is_pseudo_comp(nc)
-    character(len=100)               :: mixing_loc, alpha_loc, paramref_loc, beta_loc
+    character(len=100)               :: mixing_loc, alpha_loc, paramref_loc
     logical                          :: volshift_loc
 
     ! Get a pointer to the active thermodynamics model
@@ -421,7 +419,6 @@ contains
         act_mod_ptr%comps(i)%p_comp%Pc = Pclist(i)
         act_mod_ptr%comps(i)%p_comp%acf = acflist(i)
         if (present(Mwlist)) act_mod_ptr%comps(i)%p_comp%Mw = Mwlist(i)
-        if (present(Tboillist)) act_mod_ptr%comps(i)%p_comp%Tb = Tboillist(i)
       end if
     enddo
 
@@ -433,12 +430,12 @@ contains
     alpha_loc = "Classic"
     paramref_loc = "DEFAULT"
     volshift_loc = .False.
-    beta_loc = "Classic"
+
     ! Initialize Thermopack
     select type(p_eos => act_mod_ptr%eos(1)%p_eos)
     type is (cb_eos)
       call SelectCubicEOS(nc, act_mod_ptr%comps, &
-        p_eos, alpha_loc, paramref_loc, betastr=beta_loc)
+        p_eos, alpha_loc, paramref_loc)
 
       call SelectMixingRules(nc, act_mod_ptr%comps, &
         p_eos, mixing_loc, paramref_loc)
