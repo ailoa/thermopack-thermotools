@@ -422,11 +422,12 @@ subroutine thermopack_setlijandji(i,j,lij)
 end subroutine thermopack_setlijandji
 
 !> Get volume translation parameters
-subroutine thermopack_get_volume_shift_parameters(i,ciA,ciB,ciC,ci_type)
+subroutine thermopack_get_volume_shift_parameters(i,ciA,ciB,ciC,ciD,ciE,ciF,ci_type)
   use thermopack_var
   implicit none
   integer, intent(in) :: i
   real, intent(out) :: ciA,ciB,ciC
+  real, intent(out), optional :: ciD,ciE,ciF
   integer, intent(out) :: ci_type
   ! Locals
   type(thermo_model), pointer :: act_mod_ptr
@@ -435,15 +436,19 @@ subroutine thermopack_get_volume_shift_parameters(i,ciA,ciB,ciC,ci_type)
   ciA = act_mod_ptr%comps(i)%p_comp%cid%ciA
   ciB = act_mod_ptr%comps(i)%p_comp%cid%ciB
   ciC = act_mod_ptr%comps(i)%p_comp%cid%ciC
+  if (present(ciD)) ciD = act_mod_ptr%comps(i)%p_comp%cid%ciDD
+  if (present(ciE)) ciE = act_mod_ptr%comps(i)%p_comp%cid%ciE
+  if (present(ciF)) ciF = act_mod_ptr%comps(i)%p_comp%cid%ciF
   ci_type = act_mod_ptr%comps(i)%p_comp%cid%c_type
 end subroutine thermopack_get_volume_shift_parameters
 
 !> Tuning of volume translation parameters
-subroutine thermopack_set_volume_shift_parameters(i,ciA,ciB,ciC,ci_type)
+subroutine thermopack_set_volume_shift_parameters(i,ciA,ciB,ciC,ciD,ciE,ciF,ci_type)
   use thermopack_var
   implicit none
   integer, intent(in) :: i
   real, intent(in) :: ciA,ciB,ciC
+  real, intent(in), optional :: ciD,ciE,ciF
   integer, intent(in) :: ci_type
   ! Locals
   type(thermo_model), pointer :: act_mod_ptr
@@ -452,5 +457,8 @@ subroutine thermopack_set_volume_shift_parameters(i,ciA,ciB,ciC,ci_type)
   act_mod_ptr%comps(i)%p_comp%cid%ciA = ciA
   act_mod_ptr%comps(i)%p_comp%cid%ciB = ciB
   act_mod_ptr%comps(i)%p_comp%cid%ciC = ciC
+  if (present(ciD)) act_mod_ptr%comps(i)%p_comp%cid%ciDD = ciD
+  if (present(ciE)) act_mod_ptr%comps(i)%p_comp%cid%ciE = ciE
+  if (present(ciF)) act_mod_ptr%comps(i)%p_comp%cid%ciF = ciF
   act_mod_ptr%comps(i)%p_comp%cid%c_type = ci_type
 end subroutine thermopack_set_volume_shift_parameters
