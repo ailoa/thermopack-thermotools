@@ -118,6 +118,9 @@ append_export("thermopack_setwsparam")
 append_export("thermopack_get_volume_shift_parameters")
 append_export("thermopack_set_volume_shift_parameters")
 
+append_export("thermopack_set_alpha_corr")
+append_export("thermopack_set_beta_corr")
+
 append_export("get_bp_term", "binaryplot")
 append_export("vllebinaryxy", "binaryplot")
 append_export("global_binary_plot", "binaryplot")
