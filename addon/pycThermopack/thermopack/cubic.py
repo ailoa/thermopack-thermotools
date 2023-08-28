@@ -130,7 +130,7 @@ class cubic(thermo):
                                    ref_string_len)
         self.nc = max(len(comps.split(" ")),len(comps.split(",")))
 
-    def init_pseudo(self, comps, Tclist, Pclist, acflist, Mwlist=None):
+    def init_pseudo(self, comps, Tclist, Pclist, acflist, Mwlist=None, mixing="vdW", alpha="Classic"):
         """Initialize pseudocomponents of cubic model in thermopack. The cubic
         init routine must have been called first.
 
@@ -140,10 +140,17 @@ class cubic(thermo):
             Pclist (array_like): Critical pressures (Pa)
             acflist (array_like): acentric factors (-)
             Mwlist (array_like): Molar masses (kg/mol)
+            mixing (str): Mixing rule
+            alpha (str): alpha correlation
         """
         self.activate()
         comp_string_c = c_char_p(comps.encode('ascii'))
         comp_string_len = c_len_type(len(comps))
+        mixing_c = c_char_p(mixing.encode('ascii'))
+        mixing_len = c_len_type(len(mixing))
+        alpha_c = c_char_p(alpha.encode('ascii'))
+        alpha_len = c_len_type(len(alpha))
+
         Tc_c = (c_double * self.nc)(*Tclist)
         Pc_c = (c_double * self.nc)(*Pclist)
         acf_c = (c_double * self.nc)(*acflist)
@@ -156,6 +163,10 @@ class cubic(thermo):
                                                 POINTER(c_double),
                                                 POINTER(c_double),
                                                 POINTER(c_double),
+                                                c_char_p,
+                                                c_char_p,
+                                                c_len_type,
+                                                c_len_type,
                                                 c_len_type]
         self.eoslibinit_init_pseudo.restype = None
         self.eoslibinit_init_pseudo(comp_string_c,
@@ -163,7 +174,11 @@ class cubic(thermo):
                                     Pc_c,
                                     acf_c,
                                     Mw_c,
-                                    comp_string_len)
+                                    mixing_c,
+                                    alpha_c,
+                                    comp_string_len,
+                                    mixing_len,
+                                    alpha_len)
 
  
 

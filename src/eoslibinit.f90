@@ -380,7 +380,7 @@ contains
   !> call init_cubic_pseudo(names=(/"", "C20", "C25"/), Tclist=(\0,300,400\), &
   !>                               Pclist=(\0,100e5,200e5\), acflist=(\0,0.3,0.5\))
   !----------------------------------------------------------------------------
-  subroutine init_cubic_pseudo(comps, Tclist, Pclist, acflist, Mwlist)
+  subroutine init_cubic_pseudo(comps, Tclist, Pclist, acflist, Mwlist, mixing, alpha)
     use compdata,   only: init_component_data_from_db, initCompList
     use ideal, only: set_reference_energies
     use thermopack_var, only: nc
@@ -393,6 +393,8 @@ contains
     real, intent(in)             :: Pclist(nc)     !< List of critical pressures (Pa)
     real, intent(in)             :: acflist(nc)    !< List of acentric factors (-)
     real, intent(in), optional   :: Mwlist(nc)     !< List of molar masses (kg/mol)
+    character(len=*), optional, intent(in) :: mixing !< Mixing rule
+    character(len=*), optional, intent(in) :: alpha  !< Alpha correlation
     ! Locals
     integer                          :: ncomp, i, index, matchval_pseudo
     character(len=len_trim(comps))   :: comps_upper
@@ -430,7 +432,12 @@ contains
     alpha_loc = "Classic"
     paramref_loc = "DEFAULT"
     volshift_loc = .False.
-
+    if (present(alpha)) alpha_loc = uppercase(alpha)
+    if (present(mixing)) then
+      mixing_loc = uppercase(mixing)
+      if (str_eq(mixing_loc, "Classic")) mixing_loc = "VDW"
+    end if
+  
     ! Initialize Thermopack
     select type(p_eos => act_mod_ptr%eos(1)%p_eos)
     type is (cb_eos)
