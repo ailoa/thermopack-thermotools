@@ -3014,7 +3014,8 @@ class thermo(object):
         res_c = (c_double * (nmax*9))(0.0)
         nres_c = (c_int * 3)(0)
         wsf_c = c_int(1)
-
+        ierr_c = c_int(0)
+        
         self.s_binary_plot.argtypes = [POINTER(c_double),
                                        POINTER(c_double),
                                        POINTER(c_int),
@@ -3027,6 +3028,7 @@ class thermo(object):
                                        POINTER(c_int),
                                        POINTER(c_int),
                                        POINTER(c_double),
+                                       POINTER(c_int),
                                        c_len_type]
 
         self.s_binary_plot.restype = None
@@ -3043,7 +3045,11 @@ class thermo(object):
                            nres_c,
                            byref(wsf_c),
                            byref(min_press_c),
+                           byref(ierr_c),
                            filename_len)
+
+        if ierr_c.value > 0 or ierr_c.value < -1:
+            raise Exception("binary_plot failed")
 
         nLLE = nres_c[0]
         nL1VE = nres_c[1]
